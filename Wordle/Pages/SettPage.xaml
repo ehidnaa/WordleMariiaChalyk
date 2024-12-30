@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:data="clr-namespace:Microsoft.Maui.ApplicationModel;assembly=Microsoft.Maui.Essentials"
+             x:Class="Wordle.Pages.SettPage"
+             BindingContext="{Binding Source={RelativeSource Self}}"   
+             Title="Settings">
+    <ContentPage.Resources>
+        <!--<Style TargetType="Tables">
+            <Setter Property="VerticalOptions" Value="Center"/>
+            <Setter Property="VerticalTextAlignment" Value="Center"/>
+        </Style>-->
+    </ContentPage.Resources>
+
+    <VerticalStackLayout>
+
+        <Grid RowDefinitions="auto,auto" Margin="24,0">
+            <Label Text="User Name" TextColor="Gray" FontSize="Title"/>
+            <HorizontalStackLayout Grid.Row="1">
+                <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="Title"/>
+                <Button Text="change" Clicked="NameClick" Margin="12,0"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <Grid RowDefinitions="auto,auto,auto" Margin="24,24">
+            <Label Text="Color Theme"  TextColor="Gray" FontSize="Title"/>
+            <Grid Grid.Row="1" RowDefinitions="auto,auto,auto" RadioButtonGroup.GroupName="theme"
+                            RadioButtonGroup.SelectedValue="{Binding SelectedTheme, Mode=TwoWay}">
+                <RadioButton Content="default" Value="{x:Static data:AppTheme.Unspecified }"/>
+                <RadioButton Grid.Row="1" Content="Light"  Value="{x:Static data:AppTheme.Light }"/>
+                <RadioButton Grid.Row="2" Content="Dark"  Value="{x:Static data:AppTheme.Dark }"/>
+            </Grid>
+        </Grid>
+
+        <HorizontalStackLayout Margin="24,12">
+            <Button Text="Save changes" Clicked="SaveClick" Margin="32,0"/>
+            <Button Text="Exit without changes" Clicked="ExitClick"/>
+        </HorizontalStackLayout>
+
+    </VerticalStackLayout>
+</ContentPage>

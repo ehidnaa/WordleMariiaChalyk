@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
+             xmlns:game="clr-namespace:Wordle.Game"
+             xmlns:page="clr-namespace:Wordle.Pages"
+             x:Class="Wordle.Pages.PlayPage"
+             BindingContext="{Binding Source={RelativeSource Self}}">
+    <ContentPage.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource commonButton}">
+            <Setter Property="Padding" Value="10,4"/>
+            <Setter Property="MinimumHeightRequest" Value="38"/>
+        </Style>
+    </ContentPage.Resources>
+    
+    <Grid RowDefinitions="auto,auto,*">
+
+        <HorizontalStackLayout Margin="12,8">
+            <Label Text="Game" FontSize="Title"/>
+            <Label Text="{Binding CurrDiff.Name}" Margin="24,0" VerticalTextAlignment="Center"/>
+        </HorizontalStackLayout>
+        <Border Grid.Row="1" IsVisible="{Binding CurrDiff.HasTimeout}" Padding="4" HorizontalOptions="Start" VerticalOptions="End" Margin="12">
+            <Label Text="{Binding Timeout}" FontSize="Subtitle" />
+        </Border>
+        <!--Game.Border - grid with word->letter -->
+        <Border Grid.Row="1" Padding="8" HorizontalOptions="Center">
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Board.Words}">
+                <BindableLayout.ItemTemplate>
+                    <!--Template for one row - Word -->
+                    <DataTemplate x:DataType="game:Word">
+                        <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Letters}">
+                            <BindableLayout.ItemTemplate>
+                                <!--Template for one Letter in Word-->
+                                <DataTemplate x:DataType="game:Letter">
+                                    <Border Stroke="Gray" StrokeThickness="1" BackgroundColor="Transparent" WidthRequest="50" HeightRequest="50" Margin="1">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="2"/>
+                                        </Border.StrokeShape>
+                                        <Border x:Name="br" Scale="0" Opacity="0.5" SemanticProperties.Hint="{Binding Index}">
+                                            <!--Print Letter.Symbol-->
+                                            <Label x:Name="label" Text="{Binding Symbol}" HorizontalOptions="Center" VerticalOptions="Center"
+                                               FontFamily="Cascadia Mono" TextColor="Black" FontSize="Large" >
+                                                <Label.Triggers>
+                                                    <!--Trigger if State==green -->
+                                                    <DataTrigger TargetType="Label" Binding="{Binding State}" Value="green">
+                                                        <Setter  Property="Label.FontAttributes" Value="Bold"/>
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                            <!--Triggers for changing Colors depends on State of Letter -->
+                                            <Border.Triggers>
+                                                <DataTrigger TargetType="Border" Binding="{Binding State}" Value="green">
+                                                    <Setter  Property="Border.BackgroundColor" Value="#ff80cfa0"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Border" Binding="{Binding State}" Value="gray">
+                                                    <Setter  Property="Border.BackgroundColor" Value="LightGray"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Border" Binding="{Binding State}" Value="orange">
+                                                    <Setter  Property="Border.BackgroundColor" Value="Orange"/>
+                                                </DataTrigger>
+                                                <!--animation new Letter appears-->
+                                                <EventTrigger Event="Loaded">
+                                                    <page:LetterLoadedTrigger/>
+                                                </EventTrigger>
+                                            </Border.Triggers>
+                                        </Border>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </HorizontalStackLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </Border>
+
+        <!--TextBox for user input(Entry) & Button OK & Result Game-->
+        <Grid Grid.Row="2">
+            <Grid>
+                <VerticalStackLayout HorizontalOptions="Center">
+                    <HorizontalStackLayout VerticalOptions="Start" IsVisible="{Binding IsPlaying}" Margin="0,12,0,0">
+                        <Entry Text="{Binding UserEntry}" FontFamily="Courier New" FontAttributes="Bold" FontSize="Title" WidthRequest="150" />
+                        <Button Text="OK" Command="{Binding OkComm}"/>
+                    </HorizontalStackLayout>
+
+                    <!--Message current state of user input-->
+                    <Label Text="{Binding EntryMessage}" FontAttributes="Italic" IsVisible="{Binding IsPlaying}"/>
+
+                    <!--Debug only - Secret Word-->
+                    <Label Text="{Binding Board.Secret}" IsVisible="{Binding SHOW_SECRET}"/>
+
+                    <!--Result Game - Visible if GameOver: Win or Lose-->
+                    <VerticalStackLayout IsVisible="{Binding IsPlayOver}">
+                        <!--Show Secret word if Lose (if Win, Secret word visible as last in Board gri) -->
+                        <Label Text="{Binding Board.Secret}" FontFamily="Courier New" FontAttributes="Bold" CharacterSpacing="8" FontSize="Header" IsVisible="{Binding IsLose}" HorizontalOptions="Center"/>
+                        <!--Visible if Win-->
+                        <Label Text="Congratulations, you Win." Background="Blue" TextColor="Linen" FontAttributes="Bold" HorizontalOptions="Fill" HorizontalTextAlignment="Center" Padding="6" Margin="0,12" IsVisible="{Binding IsWin}"/>
+                        <!--Visible if Lose-->
+                        <Label Text="Sorry you lose. Try again" Background="Salmon" TextColor="Black" Padding="4" HorizontalOptions="Fill" HorizontalTextAlignment="Center" Margin="0,6,0,12" IsVisible="{Binding IsLose}" />
+                        <!--Visible Button-->
+                        <Grid ColumnDefinitions="auto,auto,auto"  HorizontalOptions="Fill">
+                            <Button Text="New game" Clicked="NewGameClick" HorizontalOptions="Start"/>
+                            <Button Grid.Column="1" Text="Settings" Clicked="SettClick"  Margin="8,0"/>
+                            <Button Grid.Column="2" Text="Exit" Clicked="ExitClick"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Grid>
+        </Grid>
+
+        <!--List all words- selectable to insert to UserInput-->
+        <Grid Grid.Row="1" Grid.RowSpan="3"  HorizontalOptions="End" IsVisible="{Binding CurrDiff.ShowWordList}">
+            <ListView x:Name="cv" ItemsSource="{Binding Board.WordList}"  SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" SelectionMode="Single"
+                      WidthRequest="60" Margin="0,0,0,24">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Label Text="{Binding }" FontSize="14" Margin="0" Padding="0" FontFamily="Cascadia Mono" HorizontalTextAlignment="Start"/>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </Grid>
+
+</ContentPage>

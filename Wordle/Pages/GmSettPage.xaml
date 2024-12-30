@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:data="clr-namespace:Wordle.Data"
+             x:Class="Wordle.Pages.GameSettPage"
+             BindingContext="{Binding Source={RelativeSource Self}}"
+             Title="Game Settings">
+
+    <Grid RowDefinitions="auto,auto,*">
+
+        <VerticalStackLayout HorizontalOptions="CenterAndExpand"
+                             RadioButtonGroup.GroupName="diff"
+                             RadioButtonGroup.SelectedValue="{Binding SelectedDiff, Mode=TwoWay}"
+                             >
+            <Label Text="Level" FontSize="Title" HorizontalOptions="Center"/>
+            <RadioButton Value="Easy" Content="Easy, View word list, no time limit"/>
+            <RadioButton Value="Normal" Content="Normal, no word list, no time limit"/>
+            <RadioButton Value="Hard" Content="Hard, no word list, time limit 10 min"/>
+        </VerticalStackLayout>
+
+        <Grid Grid.Row="1">
+            <HorizontalStackLayout HorizontalOptions="Center">
+                <Button Text="Save" Clicked="saveClick" Margin="24,0"/>
+                <Button Text="Exit" Clicked="cancelClick"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <Grid Grid.Row="2" RowDefinitions="auto,*" Margin="4,12">
+
+            <Grid ColumnDefinitions="auto,auto,*" Margin="8,0">              
+                <Label Grid.Column="1" Text="{Binding CurrSetting.UserName }" FontSize="Subtitle" Margin="4,0"/>
+                <Button Grid.Column="2" Clicked="ClearClick" Padding="4" MinimumHeightRequest="0" Text="clear results..." HorizontalOptions="End"/>
+            </Grid>
+            
+            <Grid Grid.Row="1" RowDefinitions="auto,*" Margin="8,0">
+                <Grid.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="FontSize" Value="12"/>
+                    </Style>
+                </Grid.Resources>
+                <Grid>
+                    <Grid ColumnDefinitions="130,70,50,60,40,50" Margin="10,0,0,0">
+                        <Label Text="Date"/>
+                        <Label Grid.Column="1" Text="Result"/>
+                        <Label Grid.Column="2" Text="Time"/>
+                        <Label Grid.Column="3" Text="Word"/>
+                        <Label Grid.Column="4" Text="Steps"/>
+                        <Label Grid.Column="5" Text="Level"/>
+                    </Grid>
+                </Grid>
+
+                <Border Grid.Row="1" Stroke="Gray" Padding="8" Margin="0,0,0,12">
+                    <ListView ItemsSource="{Binding CurrSetting.GameList}" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="data:OneGame">
+                                <ViewCell>
+                                    <Grid ColumnDefinitions="130,70,50,60,40,50">
+                                        <Label Text="{Binding Date}"/>
+                                        <Label Grid.Column="1" Text="{Binding Result}"/>
+                                        <Label Grid.Column="2" Text="{Binding WasteString}"/>
+                                        <Label Grid.Column="3" Text="{Binding Word}"/>
+                                        <Label Grid.Column="4" Text="{Binding Steps}"/>
+                                        <Label Grid.Column="5" Text="{Binding Difficulty}"/>
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Border>
+            </Grid>
+        </Grid>
+
+    </Grid>
+</ContentPage>

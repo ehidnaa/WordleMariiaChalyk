@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Wordle.Pages.StartPage"
+             BindingContext="{Binding Source={RelativeSource Self}}">
+
+ 
+        <HorizontalStackLayout Padding="0,20" Spacing="25" VerticalOptions="Start" HorizontalOptions="Center">
+            <Entry Text="{Binding UserName, Mode=TwoWay}" Placeholder="Enter Your Name" HorizontalOptions="Center" MinimumWidthRequest="200"/>
+            <Button Text="Ok" Command="{Binding OkComm}" HorizontalOptions="Center" />
+        </HorizontalStackLayout>
+
+</ContentPage>
